@@ -29,7 +29,7 @@ app.get('/todos', (req, res) => {
       .catch((e) => {
         res.status(400).send(e);
       })
-  })
+  });
 });
 
 app.listen(3000, () => {
