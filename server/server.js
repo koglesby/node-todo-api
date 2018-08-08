@@ -1,4 +1,5 @@
 //Library imports
+const _ = require('lodash');
 const express = require('express');
 const bodyParser = require('body-parser');
 const {ObjectID} = require('mongodb');
@@ -69,6 +70,36 @@ app.delete('/todos/:id', (req,res) => {
     .catch((e) => {
       res.status(400).send();
     })
+});
+
+app.patch('/todos/:id', (req, res) => {
+  let id = req.params.id;
+  let body = _.pick(req.body, ['text', 'completed']);
+  // Creates an object composed of the picked object properties.
+  // { text: req.body.text, completed: req.body.completed }
+
+  if(!ObjectID.isValid(id)) {
+    console.log("invalid id");
+    return res.status(404).send();
+  }
+
+  if (_.isBoolean(body.completed) && body.completed) {
+    // checks if body.completed is a boolean value(not null or another type)
+    // and if completed is true
+    body.completedAt = new Date().getTime();
+  } else {
+    body.completed = false;
+    body.completedAt = null;
+  }
+
+  Todo.findByIdAndUpdate(id, {$set: body}, {new: true}).then((todo) => {
+    if (!todo) {
+      return res.status(404).send();
+    }
+    res.send({todo});
+  }).catch((e) => {
+    res.status(400).send();
+  })
 });
 
 app.listen(port, () => {
