@@ -53,6 +53,23 @@ UserSchema.methods.generateAuthToken = function () {
 };
 // arrow functions do not bind a this keyword
 
+UserSchema.statics.findByToken = function (token) {
+  let User = this;
+  let decoded;
+
+  try {
+    decoded = jwt.verify(token, '123asd');
+  } catch (e) {
+    return Promise.reject();
+  }
+  return User.findOne({
+    '_id': decoded._id,
+    'tokens.token': token,
+    'tokens.access': 'auth'
+  });
+
+};
+//with statics, everything you add onto it turns to a model method instead of an instance method
 
 const User = mongoose.model('Users', UserSchema);
 
