@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const _ = require('lodash');
 const bcrypt = require('bcryptjs');
 
-let UserSchema = new mongoose.Schema({
+const UserSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
@@ -75,7 +75,7 @@ UserSchema.statics.findByToken = function (token) {
 
   try {
     decoded = jwt.verify(token, '123asd');
-  } catch (e) {
+  } catch (e)  {
     return Promise.reject();
   }
   return User.findOne({
@@ -87,6 +87,6 @@ UserSchema.statics.findByToken = function (token) {
 };
 //with statics, everything you add onto it turns to a model method instead of an instance method
 
-const User = mongoose.model('Users', UserSchema);
+let User = mongoose.model('Users', UserSchema);
 
 module.exports = {User};

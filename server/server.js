@@ -12,7 +12,7 @@ const { User } = require('./models/user');
 const {authenticate} = require('./middleware/authenticate');
 
 let app = express();
-const port = process.env.PORT;
+let port = process.env.PORT;
 
 app.use(bodyParser.json());
 
