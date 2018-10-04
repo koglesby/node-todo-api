@@ -4,6 +4,7 @@ const _ = require('lodash');
 const express = require('express');
 const bodyParser = require('body-parser');
 const {ObjectID} = require('mongodb');
+require('cache-require-paths');
 
 // Local imports
 const { mongoose } = require('./db/mongoose');
