@@ -21,19 +21,21 @@ const UserSchema = new mongoose.Schema({
     required: true,
     minLength: 6
   },
-  tokens: [{
-    access: {
-      type: String,
-      required: true
-    },
-    token: {
-      type: String,
-      required: true
+  tokens: [
+    {
+      access: {
+        type: String,
+        required: true
+      },
+      token: {
+        type: String,
+        required: true
+      }
     }
-  }]
+  ]
 });
 
-UserSchema.methods.toJSON = function () {
+UserSchema.methods.toJSON = function() {
   let user = this;
   let userObject = user.toObject();
 
@@ -41,12 +43,14 @@ UserSchema.methods.toJSON = function () {
 };
 // prevents the other information from being sent back
 
-UserSchema.methods.generateAuthToken = function () {
-  let user =  this;
-  let access = 'auth';
-  let token = jwt.sign({_id: user._id.toHexString(), access}, '123asd').toString();
+UserSchema.methods.generateAuthToken = function() {
+  var user = this;
+  var access = 'auth';
+  var token = jwt
+    .sign({ _id: user._id.toHexString(), access }, '123asd')
+    .toString();
 
-  user.tokens = user.tokens.concat([{access, token}]);
+  user.tokens = user.tokens.concat([{ access, token }]);
 
   return user.save().then(() => {
     return token;
@@ -54,8 +58,28 @@ UserSchema.methods.generateAuthToken = function () {
 };
 // arrow functions do not bind a this keyword
 
-UserSchema.pre('save', function (next) {
-  let user =  this;
+UserSchema.statics.findByCredentials = function(email, password) {
+  var User = this;
+
+  return User.findOne({ email }).then(user => {
+    if (!user) {
+      return Promise.reject();
+    }
+
+    return new Promise((resolve, reject) => {
+      bcrypt.compare(password, user.password, (err, res) => {
+        if (res) {
+          resolve(user);
+        } else {
+          reject();
+        }
+      });
+    });
+  });
+};
+
+UserSchema.pre('save', function(next) {
+  var user = this;
 
   if (user.isModified('password')) {
     bcrypt.genSalt(10, (err, salt) => {
@@ -69,24 +93,23 @@ UserSchema.pre('save', function (next) {
   }
 });
 
-UserSchema.statics.findByToken = function (token) {
-  let User = this;
-  let decoded;
+UserSchema.statics.findByToken = function(token) {
+  var User = this;
+  var decoded;
 
   try {
     decoded = jwt.verify(token, '123asd');
-  } catch (e)  {
+  } catch (e) {
     return Promise.reject();
   }
   return User.findOne({
-    '_id': decoded._id,
+    _id: decoded._id,
     'tokens.token': token,
     'tokens.access': 'auth'
   });
-
 };
 //with statics, everything you add onto it turns to a model method instead of an instance method
 
 let User = mongoose.model('Users', UserSchema);
 
-module.exports = {User};
+module.exports = { User };
