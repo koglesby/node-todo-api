@@ -56,7 +56,16 @@ UserSchema.methods.generateAuthToken = function() {
     return token;
   });
 };
-// arrow functions do not bind a this keyword
+
+UserSchema.methods.removeToken = function(token) {
+  var user = this;
+
+  return user.update({
+    $pull: {
+      tokens: { token }
+    }
+  });
+};
 
 UserSchema.statics.findByCredentials = function(email, password) {
   var User = this;
