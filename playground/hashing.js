@@ -1,4 +1,4 @@
-const {SHA256} =require('crypto-js');
+const { SHA256 } = require('crypto-js');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
@@ -49,6 +49,6 @@ bcrypt.compare(password, hashedPassword, (err, res) => {
 // } else {
 //   console.log('Data was changed');
 // }
-//salting the hash
-// - adding in a secret so the is different,
+// salting the hash
+// - adding in a secret
 // so you can tell if the data has been chnged
